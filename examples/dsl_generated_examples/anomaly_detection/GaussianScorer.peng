@@ -2,13 +2,15 @@ pipeline MyPipeline {
     kafka {
         broker: "localhost:39092"
         input_topic: "anomaly-pred"
-        output_topic : "LocalOutlierFactor-anomaly"
-        consumer_group: "LocalOutlierFactor"
+        consumer_group: "GaussianScorer"
     }
     model {
+
         type : anomaly
-        name: LocalOutlierFactor
+        name: GaussianScorer
 
     }
+
+
 
 }

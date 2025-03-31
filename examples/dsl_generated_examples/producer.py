@@ -31,7 +31,7 @@ if __name__ == "__main__":
     #    seed=42,
     #    position=500,
     #    width=40).take(1000)
-    dataset = datasets.Bananas().take(500)
+    # dataset = datasets.Bananas().take(500)
     # dataset = [
     #     [1, 2],
     #     [1, 4],
@@ -42,7 +42,9 @@ if __name__ == "__main__":
     #     [5, 0],
     #     [5, 2],
     #     [5, 4]
-    # ]
+    #
+    # dataset = datasets.CreditCard()
+    dataset = [0.5, 0.45, 0.43, 0.44, 0.445, 0.45, 0.0]
 
 # %%
     dataset
@@ -59,11 +61,11 @@ if __name__ == "__main__":
 
     for idx, row in df.iterrows():
 
-        sample_dict = {**row[0], 'class': row[1]}
+        # sample_dict = {**row[0], 'class': row[1]}
         # convert to json format
 
-        # json_message = row.to_json()
-        json_message = json.dumps(sample_dict)
+        json_message = row.to_json()
+        # json_message = json.dumps(sample_dict)
 
         # Produce the message to kafka
         producer.produce(

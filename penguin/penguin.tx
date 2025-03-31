@@ -5,7 +5,7 @@ Pipeline :
         kafka=Kafka
         model=Model
         (features=Feature)?
-        metrics = Metric
+        (metrics = Metric)?
         (target=Target)?
         (plot = Plot)?
         

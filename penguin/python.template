@@ -141,6 +141,7 @@ sdf.drop([
 ])
 {%endif%}
 
+{% if pipeline.metrics -%}
 # Define metrics
 metric = {% for metric in pipeline.metrics.metrics -%}  
 metrics.{{metric}}() 
@@ -151,7 +152,7 @@ metrics.{{metric}}()
 {% for metric in pipeline.metrics.metrics -%}  
 {{metric}} = [] 
 {% endfor %} 
-
+{%-endif%}
 
 {%if pipeline.target.mappings %}
 # Define target mapping
@@ -195,21 +196,26 @@ def train_and_predict(X):
     
     {% if pipeline.model.proba -%}
     y_predicted = model.predict_proba_one(X)
+    {% elif pipeline.model.type == 'anomaly'%}
+    y_predicted  = model.score_one(X)
     {%- else%}
     y_predicted = model.predict_one(X)
     {%- endif %}
     
-    
+    {% if pipeline.metrics -%}
     # Update metric
     {%if pipeline.model.type == 'cluster' -%}
     metric.update(X, y_predicted,  model.centers) 
     {%-else %}
     metric.update(y, y_predicted )
     {%-endif%}
+    {%-endif%}
 
     {% if pipeline.target %}
     print(f"True y: {y}, Predicted: {y_predicted}")
     {% endif %}
+    
+    {% if pipeline.metrics -%}
     print(metric)
     {%-if pipeline.metrics.metrics|length > 1%}
     {% for metric in pipeline.metrics.metrics -%}  
@@ -218,7 +224,9 @@ def train_and_predict(X):
     {%else%}
     {{pipeline.metrics.metrics[0]}}.append(metric.get()) 
     {%endif%}
-    
+    {%else%}
+    print(y_predicted)
+    {%-endif%}
 
 
     with open('{{pipeline.model.name}}.pkl', 'wb') as model_file:
@@ -255,7 +263,8 @@ def train_and_predict(X):
                 "predicted probabilities": json.dumps(y_predicted) , 
                 {%- else%}
                 "Prediction": y_predicted,
-                {%- endif %}   
+                {%- endif %} 
+                {% if pipeline.metrics -%}  
                 {%-if pipeline.metrics.metrics|length > 1-%}
                 {% for metric in pipeline.metrics.metrics %}  
                 "{{metric}}": metric.get()[{{loop.index0}}]
@@ -265,6 +274,7 @@ def train_and_predict(X):
                 {%else%}
                 "{{pipeline.metrics.metrics[0]}}": metric.get()
                 {%endif%}
+                {%- endif %}
             }   
 
             {%- else -%}
@@ -339,7 +349,7 @@ plt.show()
 
 {% endif %}
 
-
+{% if pipeline.metrics -%} 
 {% for metric in pipeline.metrics.metrics -%}  
 plt.plot({{metric}})
 plt.xlabel('Iterations')
@@ -347,3 +357,4 @@ plt.ylabel('{{metric}}')
 plt.title('{{metric}} over Training Iterations')
 plt.show()
 {% endfor %} 
+{% endif %}
