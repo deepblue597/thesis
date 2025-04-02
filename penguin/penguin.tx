@@ -3,6 +3,7 @@ Pipeline :
     'pipeline' name=ID '{' 
 
         kafka=Kafka
+        preprocessors*= Preprocessing // TODO: Check if this change is working 
         model=Model
         (features=Feature)?
         (metrics = Metric)?
@@ -37,9 +38,6 @@ Model :
         )?
         (multiclass = Multiclass)?
                 
-        ('preprocessing' ':''{' 
-            preprocessors+= Preprocessing  
-        '}')?
         'type' ':' type = ID 
         'name' ':'  name = ID
         ('probabilistic' ':' proba?= BOOL)?
